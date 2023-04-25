@@ -4,13 +4,21 @@
 
 """
 import csv
-import sys
+# import sys
 
-check_failed_flag = False
-failed_files = []
-def scan_file(filename:str, overlap_list)->int:
-    # Input settings
-    CSV_PATH = filename
+# check_failed_flag = False
+# failed_files = []
+def scan_file(filename:str, overlap_list:int)->int:
+    """Checks input filename for overlaps in start and end versions
+
+    Args:
+        filename (str): name of the input file
+        overlap_list (dict): a dictionary of keys with overlaps and their indices
+
+    Returns:
+        int: Count of number of overlaps found in input
+    """
+    # TODO: Implement getopt options for input settings
     KEY_COLUMN_NAME = 'key_id'
     START_COLUMN_NAME = 'startv'
     END_COLUMN_NAME = 'endv'
@@ -19,7 +27,7 @@ def scan_file(filename:str, overlap_list)->int:
     overlap_count = 0
     overlap_list = {}
 
-    with open(CSV_PATH, 'r', encoding='utf-8') as csv_in:
+    with open(filename, 'r', encoding='utf-8') as csv_in:
         csv_reader = csv.DictReader(csv_in, delimiter=',')
         line_count = 1
         for row in csv_reader:
@@ -102,7 +110,6 @@ def scan_file(filename:str, overlap_list)->int:
                 if end_value == '':
                     key_check.update({
                         key_value: {
-                            # TODO: Change end value to consistent format
                             'lines': {line_count: [start_value, '']},
                             'has_current_version': True,
                             'current_version_line': line_count
@@ -119,7 +126,7 @@ def scan_file(filename:str, overlap_list)->int:
             line_count += 1
 
         print(f'[{filename}]')
-        for key in overlap_list:
+        for key in overlap_list.values():
             for entry in key:
                 overlap_count += 1
         print('Number of version overlaps found:', overlap_count)
@@ -127,14 +134,14 @@ def scan_file(filename:str, overlap_list)->int:
     # Check for overlaps in this file
     if overlap_count > 0:
         print('List of overlapping versions for keys and their index:', overlap_list)
-        check_failed_flag = True
-        failed_files.append(filename)
+    #     check_failed_flag = True
+    #     failed_files.append(filename)
 
-    return overlap_count
+    return overlap_list
 
 # Prints run status for file(s)
-if check_failed_flag:
-    print(f"Run ended. Version overlap found in dataset(s): {failed_files}")
-    sys.exit("Checks failed.")
-else:
-    print("Run ended. No overlaps found: Checks passed.")
+# if check_failed_flag:
+#     print(f"Run ended. Version overlap found in dataset(s): {failed_files}")
+#     sys.exit("Checks failed.")
+# else:
+#     print("Run ended. No overlaps found: Checks passed.")
