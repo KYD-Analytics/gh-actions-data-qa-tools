@@ -66,7 +66,7 @@ def scan_file(filename:str, overlap_list:int)->int:
                         })
                         # Check if current version overlaps with an existing key
                         for k, v in key_check[key_value]['lines'].items():
-                            if start_value < v[1]:
+                            if int(start_value) < int(v[1]):
                                 # Add current version to tracker
                                 if overlap_list.get(key_value):
                                     overlap_list[key_value].update({
@@ -85,7 +85,9 @@ def scan_file(filename:str, overlap_list:int)->int:
                 else:
                     for k, v in key_check[key_value]['lines'].items():
                         # Check if record is within previous version ranges
-                        if not ((start_value < v[0] and end_value <= v[0]) or (start_value >= v[1] and end_value > v[1]) or (end_value <= v[0] and v[1] == '')):
+                        if not ((int(start_value) < int(v[0]) and int(end_value) <= int(v[0])) or
+                                (int(start_value) >= int(v[1]) and int(end_value) > int(v[1])) or
+                                (int(end_value) <= int(v[0]) and int(v[1]) == '')):
                             # Add record to tracker
                             if overlap_list.get(key_value):
                                 overlap_list[key_value].update({
