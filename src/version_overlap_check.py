@@ -50,53 +50,31 @@ def scan_file(filename:str, overlap_list:int)->int:
                         })
                 # Current version case
                 elif end_value == '':
-                    # Has existing current version that clashes with new current version
-                    if key_check[key_value]['has_current_version']:
-                        # Add old current version to tracker
-                        c_version_line = key_check[key_value]['current_version_line']
-                        if overlap_list.get(key_value):
-                            overlap_list[key_value].update({
-                                c_version_line: key_check[key_value]['lines'][c_version_line]
-                            })
-                        else:
-                            overlap_list.update({
-                                key_value: {
-                                    c_version_line: key_check[key_value]['lines'][c_version_line]
-                                }
-                            })
-                        # Add new current version to tracker and checked list
-                        overlap_list[key_value].update({
-                            line_count: [start_value, 99999]
-                        })
-                        key_check[key_value]['lines'].update({
-                            line_count: [start_value, 99999]
-                        })
-                    # Set record as existing current version
-                    else:
-                        key_check[key_value].update({
-                            'has_current_version': True,
-                            'current_version_line': line_count
-                        })
-                        # Check if current version overlaps with an existing key
-                        for k, v in key_check[key_value]['lines'].items():
-                            if int(start_value) < int(v[1]):
-                                # Add current version to tracker
-                                if overlap_list.get(key_value):
-                                    overlap_list[key_value].update({
-                                        line_count: [start_value, 99999]
-                                    })
-                                else:
-                                    overlap_list.update({
-                                        key_value: {
-                                            line_count: [start_value, 99999]
-                                        }
-                                    })
-                                # Add existing key to tracker
+                    # Check if current version overlaps with an existing key
+                    for k, v in key_check[key_value].items():
+                        if int(start_value) < int(v[1]):
+                            # Add current version to tracker
+                            if overlap_list.get(key_value):
                                 overlap_list[key_value].update({
-                                    k: v
+                                    line_count: [start_value, 99999]
                                 })
+                            else:
+                                overlap_list.update({
+                                    key_value: {
+                                        line_count: [start_value, 99999]
+                                    }
+                                })
+                            # Add existing key to tracker
+                            overlap_list[key_value].update({
+                                k: v
+                            })
+                    # Add current version to checked list
+                    key_check[key_value].update({
+                        line_count: [start_value, 99999]
+                    })
+                        
                 else:
-                    for k, v in key_check[key_value]['lines'].items():
+                    for k, v in key_check[key_value].items():
                         # Check if record is within previous version ranges
                         if not ((int(start_value) < int(v[0]) and int(end_value) <= int(v[0])) or
                                 (int(start_value) >= int(v[1]) and int(end_value) > int(v[1])) or
@@ -117,7 +95,7 @@ def scan_file(filename:str, overlap_list:int)->int:
                                 k: v
                             })
                     # Add record to checked list
-                    key_check[key_value]['lines'].update({
+                    key_check[key_value].update({
                         line_count: [start_value, end_value]
                     })
             else:
@@ -125,17 +103,13 @@ def scan_file(filename:str, overlap_list:int)->int:
                 if end_value == '':
                     key_check.update({
                         key_value: {
-                            'lines': {line_count: [start_value, 99999]},
-                            'has_current_version': True,
-                            'current_version_line': line_count
+                            line_count: [start_value, 99999]
                         }
                     })
                 else:
                     key_check.update({
                         key_value: {
-                            'lines': {line_count: [start_value, end_value]},
-                            'has_current_version': False,
-                            'current_version_line': None
+                            line_count: [start_value, end_value]
                         }
                     })
             line_count += 1
