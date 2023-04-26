@@ -72,7 +72,18 @@ def scan_file(filename:str, overlap_list:int)->int:
                     key_check[key_value].update({
                         line_count: [start_value, 99999]
                     })
-                        
+                # If start version is larger than end version
+                elif int(start_value) > int(end_value):
+                    if overlap_list.get(key_value):
+                        overlap_list[key_value].update({
+                            line_count: 'Start value greater than end value'
+                        })
+                    else:
+                        overlap_list.update({
+                            key_value: {
+                                line_count: 'Start value greater than end value'
+                            }
+                        })
                 else:
                     for k, v in key_check[key_value].items():
                         # Check if record is within previous version ranges

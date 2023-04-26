@@ -166,12 +166,15 @@ def test_scenario16():
         'FR': {9: 'Invalid start value'}
     }
 
-# def test_scenario17():
-#     """Passing test for having a range before a current version (current version first)
-#     """
-#     test17 = 0
-#     count = scan_file(BASE_PATH + '/tests/test_scenario17.csv', test17)
-#     assert count == {}
+def test_scenario17():
+    """Passing test for having a range before a current version (current version first)
+    """
+    test17 = 0
+    count = scan_file(BASE_PATH + '/tests/test_scenario17.csv', test17)
+    assert count == {
+        'UK': {4: 'Start value greater than end value'},
+        'FR': {9: 'Start value greater than end value'}
+    }
 
 # def test_scenario():
 #     """Test for passing case, normal back-to-back versions
