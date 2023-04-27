@@ -4,19 +4,15 @@
 
 """
 import csv
-# import sys
 
-# check_failed_flag = False
-# failed_files = []
-def scan_file(filename:str, overlap_list:int)->int:
+def scan_file(filename:str) -> tuple[int, dict]:
     """Checks input filename for overlaps in start and end versions
 
     Args:
         filename (str): name of the input file
-        overlap_list (dict): a dictionary of keys with overlaps and their indices
 
     Returns:
-        int: Count of number of overlaps found in input
+        tuple: returns a count (int) and key + index of overlaps (dict)
     """
     # TODO: Implement getopt options for input settings
     KEY_COLUMN_NAME = 'key_id'
@@ -34,9 +30,9 @@ def scan_file(filename:str, overlap_list:int)->int:
             key_value = row[KEY_COLUMN_NAME]
             start_value = row[START_COLUMN_NAME]
             end_value = row[END_COLUMN_NAME]
-            # Check if key exists
+            # Check if key exists in checked list
             if key_value in key_check:
-                # Check if invalid start version
+                # Check if invalid start version (non-integer value)
                 if not start_value.isdigit():
                     if overlap_list.get(key_value):
                         overlap_list[key_value].update({
@@ -48,12 +44,12 @@ def scan_file(filename:str, overlap_list:int)->int:
                                 line_count: 'Invalid start value'
                             }
                         })
-                # Current version case
+                # Current version case (versions that have start values but no end values)
                 elif end_value == '':
-                    # Check if current version overlaps with an existing key
+                    # Check if current version overlaps with an existing key in checked list
                     for k, v in key_check[key_value].items():
                         if int(start_value) < int(v[1]):
-                            # Add current version to tracker
+                            # Add current version to tracker list
                             if overlap_list.get(key_value):
                                 overlap_list[key_value].update({
                                     line_count: [start_value, 99999]
@@ -64,7 +60,7 @@ def scan_file(filename:str, overlap_list:int)->int:
                                         line_count: [start_value, 99999]
                                     }
                                 })
-                            # Add existing key to tracker
+                            # Add existing key to tracker list
                             overlap_list[key_value].update({
                                 k: v
                             })
@@ -72,7 +68,7 @@ def scan_file(filename:str, overlap_list:int)->int:
                     key_check[key_value].update({
                         line_count: [start_value, 99999]
                     })
-                # If start version is larger than end version
+                # If start version is larger than end version, add to tracker list
                 elif int(start_value) > int(end_value):
                     if overlap_list.get(key_value):
                         overlap_list[key_value].update({
@@ -90,7 +86,7 @@ def scan_file(filename:str, overlap_list:int)->int:
                         if not ((int(start_value) < int(v[0]) and int(end_value) <= int(v[0])) or
                                 (int(start_value) >= int(v[1]) and int(end_value) > int(v[1])) or
                                 (int(end_value) <= int(v[0]) and v[1] == 99999)):
-                            # Add record to tracker
+                            # Add record to tracker list
                             if overlap_list.get(key_value):
                                 overlap_list[key_value].update({
                                     line_count: [start_value, end_value]
@@ -101,7 +97,7 @@ def scan_file(filename:str, overlap_list:int)->int:
                                         line_count: [start_value, end_value]
                                     }
                                 })
-                            # Add existing key to tracker
+                            # Add existing key to tracker list
                             overlap_list[key_value].update({
                                 k: v
                             })
@@ -125,23 +121,14 @@ def scan_file(filename:str, overlap_list:int)->int:
                     })
             line_count += 1
 
+        # Calculate counts for overlaps from tracker list
         print(f'[{filename}]')
         for key in overlap_list.values():
-            for entry in key:
-                overlap_count += 1
+            overlap_count += len(key)
         print('Number of version overlaps found:', overlap_count)
 
-    # Check for overlaps in this file
+    # Print keys and indices if overlaps exist
     if overlap_count > 0:
         print('List of overlapping versions for keys and their index:', overlap_list)
-    #     check_failed_flag = True
-    #     failed_files.append(filename)
 
-    return overlap_list
-
-# Prints run status for file(s)
-# if check_failed_flag:
-#     print(f"Run ended. Version overlap found in dataset(s): {failed_files}")
-#     sys.exit("Checks failed.")
-# else:
-#     print("Run ended. No overlaps found: Checks passed.")
+    return overlap_count, overlap_list
