@@ -15,7 +15,7 @@ def main(argv:any):
     Args:
         argv (any): Arguments from command line 
             e.g: csv_qa.py -k <keyname> -s <startname> -e <endname> <csv file path>
-    """    
+    """
     key_column_name = ''
     start_column_name = ''
     end_column_name = ''
