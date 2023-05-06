@@ -5,20 +5,18 @@
 """
 import csv
 
-def scan_file(filename:str) -> tuple[int, dict]:
+def scan_file(filename:str, key:str='key_id', start:str='startv', end:str='endv') -> tuple[int, dict]:
     """Checks input filename for overlaps in start and end versions
 
     Args:
         filename (str): name of the input file
+        key (str, optional): Name of the key column. Defaults to 'key_id'.
+        start (str, optional): Name of the start column. Defaults to 'startv'.
+        end (str, optional): Name of the end column. Defaults to 'endv'.
 
     Returns:
-        tuple: returns a count (int) and key + index of overlaps (dict)
+        tuple[int, dict]: returns a count (int) and key + index of overlaps (dict)
     """
-    # TODO: Implement getopt options for input settings
-    KEY_COLUMN_NAME = 'key_id'
-    START_COLUMN_NAME = 'startv'
-    END_COLUMN_NAME = 'endv'
-
     key_check = {}
     overlap_count = 0
     overlap_list = {}
@@ -29,7 +27,7 @@ def scan_file(filename:str) -> tuple[int, dict]:
 
         Args:
             value (any): value to be added to the key
-        """        
+        """
         if overlap_list.get(key_value):
             overlap_list[key_value].update({
                 line_count: value
@@ -45,9 +43,10 @@ def scan_file(filename:str) -> tuple[int, dict]:
         csv_reader = csv.DictReader(csv_in, delimiter=',')
         line_count = 1
         for row in csv_reader:
-            key_value = row[KEY_COLUMN_NAME]
-            start_value = row[START_COLUMN_NAME]
-            end_value = row[END_COLUMN_NAME]
+            # Takes the values from the corresponding columns
+            key_value = row[key]
+            start_value = row[start]
+            end_value = row[end]
             # Check if key exists in checked list
             if key_value in key_check:
                 # Check if invalid start version (non-integer value)
@@ -105,8 +104,8 @@ def scan_file(filename:str) -> tuple[int, dict]:
 
         # Calculate counts for overlaps from tracker list
         print(f'[{filename}]')
-        for key in overlap_list.values():
-            overlap_count += len(key)
+        for k in overlap_list.values():
+            overlap_count += len(k)
         print('Number of version overlaps found:', overlap_count)
 
     # Print keys and indices if overlaps exist
