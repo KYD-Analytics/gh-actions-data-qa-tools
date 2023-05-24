@@ -1,0 +1,48 @@
+name: refdata_quality_check
+on:
+  pull_request:
+    paths:
+      - '**.csv'
+jobs:
+  check-key-duplicates:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set up Python 3.x
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Get all changed map file(s)
+        id: changed-map-files
+        uses: tj-actions/changed-files@v35
+        with:
+          files: |
+            **/**_MAP.csv
+
+      - name: Get all changed lookup file(s)
+        id: changed-lookup-files
+        uses: tj-actions/changed-files@v35
+        with:
+          files: |
+            **/**_LKP.csv
+
+      - name: Run step if map files are changed
+        if: steps.changed-map-files.outputs.any_changed == 'true'
+        run: |
+          echo "List of map files checked for duplicates: ${{ steps.changed-map-files.outputs.all_changed_files }}"
+
+      - name: Run step if lookup files are changed
+        if: steps.changed-lookup-files.outputs.any_changed == 'true'
+        run: |
+          echo "List of lookup files checked for duplicates: ${{ steps.changed-lookup-files.outputs.all_changed_files }}"
+
+      - name: Run python checkfile
+        run: python multi_csv_index.py -c 6 ${{ steps.changed-map-files.outputs.all_changed_files }}
+
+      - name: Run python checkfile
+        run: python multi_csv_index.py -c 4 ${{ steps.changed-lookup-files.outputs.all_changed_files }}
