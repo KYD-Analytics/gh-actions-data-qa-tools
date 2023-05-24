@@ -47,6 +47,7 @@ def main(argv:any):
         print('Value for end not found, default value will be used.')
 
     failed_files = []
+    checked_files = []
     # Check multiple files for overlapping versions
     for file in args:
         output = scan_file(file, key=key_column_name, start=start_column_name, end=end_column_name)
@@ -55,13 +56,14 @@ def main(argv:any):
         if output[0] > 0:
             failed_files.append(file)
             # print('List of overlapping versions for keys and their index:', output[1])
+        checked_files.append(file)
 
     # Print filenames that failed checks or print that all checks had passed
     if len(failed_files) > 0:
         print(f"Run ended. Version overlap found in dataset(s): {failed_files}")
         sys.exit("Checks failed.")
     else:
-        print("Run ended. No overlaps found: Checks passed.")
+        print("Run ended. No overlaps found in files: ", checked_files)
 
 if __name__ == "__main__":
     main(sys.argv[1:])
