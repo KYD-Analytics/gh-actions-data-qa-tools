@@ -1,0 +1,67 @@
+name: concat_refdata
+on:
+  workflow_run:
+    workflows: [refdata_quality_check, check_all]
+    types: [completed]
+  push:
+    paths:
+      - 'tests/**_MAP.csv'
+      - 'tests/**_LKP.csv'
+jobs:
+  concatenate_refdata:
+    runs-on: ubuntu-latest
+    name: Concatenate mappings and lookups
+    steps:
+      - name: Set up Python 3.x
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Checkout repo content
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      # Check for changed MAP files
+      - name: Get changed mapping files in the tests folder
+        id: changed-map-files
+        uses: tj-actions/changed-files@v35
+        with:
+          files: tests/**_MAP.csv
+
+      # Check for changed LKP files
+      - name: Get changed lookup files in the tests folder
+        id: changed-lookup-files
+        uses: tj-actions/changed-files@v35
+        with:
+          files: tests/**_LKP.csv
+
+      # Run concatenation on MAP files and push output file into repo
+      - name: Run step if any mapping file(s) are modified (ACMRD)
+        if: steps.changed-map-files.outputs.any_modified == 'true'
+        working-directory: ./src
+        run: |
+          echo "Files modified: ${{ steps.changed-map-files.outputs.all_modified_files }}"
+          python concat_rd.py -o ../tests_deploy/mapping.csv ../tests/**_MAP.csv
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add ../tests_deploy/mapping.csv
+          git commit -m "Github Actions auto-generated concatenation"
+
+      # Run concatenation on LKP files and push output file into repo
+      - name: Run step if any lookup file(s) are modified (ACMRD)
+        if: steps.changed-lookup-files.outputs.any_modified == 'true'
+        working-directory: ./src
+        run: |
+          echo "Files modified: ${{ steps.changed-lookup-files.outputs.all_modified_files }}"
+          python concat_rd.py -o ../tests_deploy/lookup.csv ../tests/**_LKP.csv
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add ../tests_deploy/lookup.csv
+          git commit -m "Github Actions auto-generated concatenation"
+      
+      # Push the committed changes
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          force_with_lease: true
