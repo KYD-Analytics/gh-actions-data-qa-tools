@@ -1,0 +1,34 @@
+name: check_all
+on:
+  workflow_dispatch:
+    inputs:
+      checkAll:
+        description: 'Check all'
+        required: true
+        type: choice
+        options:
+          - map
+          - lookup
+jobs:
+  check-key-duplicates:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set up Python 3.x
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Run python checkfile on map
+        if: ${{ github.event.inputs.checkAll }} == 'map'
+        working-directory: ./src
+        run: python multi_csv_index.py -c 6 ../map/**.csv
+
+      - name: Run python checkfile on lookup
+        if: ${{ github.event.inputs.checkAll }} == 'lookup'
+        working-directory: ./src
+        run: python multi_csv_index.py -c 4 ../lookup/**.csv
