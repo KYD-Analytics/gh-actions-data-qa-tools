@@ -5,6 +5,7 @@
 """
 import sys
 import getopt
+from pathlib import Path
 from version_overlap_check import scan_file
 
 def main(argv:any):
@@ -56,7 +57,7 @@ def main(argv:any):
         if output[0] > 0:
             failed_files.append(file)
             # print('List of overlapping versions for keys and their index:', output[1])
-        checked_files.append(file)
+        checked_files.append(Path(file).stem)
 
     # Print filenames that failed checks or print that all checks had passed
     if len(failed_files) > 0:

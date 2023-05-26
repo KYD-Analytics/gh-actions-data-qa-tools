@@ -5,14 +5,14 @@
 """
 import csv
 
-def scan_file(filename:str, key:str='key_id', start:str='startv', end:str='endv') -> tuple[int, dict]:
+def scan_file(filename:str, key:int=0, start:int=-2, end:int=-1) -> tuple[int, dict]:
     """Checks input filename for overlaps in start and end versions
 
     Args:
         filename (str): name of the input file
-        key (str, optional): Name of the key column. Defaults to 'key_id'.
-        start (str, optional): Name of the start column. Defaults to 'startv'.
-        end (str, optional): Name of the end column. Defaults to 'endv'.
+        key (int, optional): Index of the key column. Defaults to 0.
+        start (int, optional): Index of the start column. Defaults to -2.
+        end (int, optional): Index of the end column. Defaults to -1.
 
     Returns:
         tuple[int, dict]: returns a count (int) and key + index of overlaps (dict)
@@ -40,8 +40,13 @@ def scan_file(filename:str, key:str='key_id', start:str='startv', end:str='endv'
             })
 
     with open(filename, 'r', encoding='utf-8') as csv_in:
-        csv_reader = csv.DictReader(csv_in, delimiter=',')
-        line_count = 1
+        # Read columns using index number
+        csv_reader = csv.reader(csv_in, delimiter=',')
+        line_count = 0
+        # # Read columns using header name
+        # csv_reader = csv.DictReader(csv_in, delimiter=',')
+        # line_count = 1
+
         for row in csv_reader:
             # Takes the values from the corresponding columns
             key_value = row[key]
