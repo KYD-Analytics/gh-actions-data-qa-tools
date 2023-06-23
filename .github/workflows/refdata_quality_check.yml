@@ -17,6 +17,18 @@ jobs:
         with:
           fetch-depth: 0
 
+      # Upload branch name as artifact for use in following workflow
+      - name: Save branch name
+        env:
+          BRANCH_NAME: ${{ github.ref }}
+        run: |
+          mkdir -p ./branch_name
+          echo $BRANCH_NAME > ./branch_name/current_name.txt
+      - uses: actions/upload-artifact@v3
+        with:
+          name: triggering_branch_name
+          path: branch_name/current_name.txt
+
       - name: Get all changed map file(s)
         id: changed-map-files
         uses: tj-actions/changed-files@v35
